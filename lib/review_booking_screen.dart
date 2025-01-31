@@ -1,7 +1,9 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'ApiServices/api_services.dart';
 import 'components/coupon_card.dart';
 import 'components/guest_details_card.dart';
 import 'components/text_widget.dart';
@@ -15,11 +17,32 @@ class ReviewBookingScreen extends StatefulWidget {
 
 class _ReviewBookingScreenState extends State<ReviewBookingScreen> {
   bool isChecked = false;
+  final List<String> stateItems = [
+    'Hyderabad',
+    'Kerala',
+    'Odisa',
+  ];
+
+  String? selectedValue;
+  void initState() {
+    super.initState();
+    fetchReviewBookingDetails();
+  }
+
+  fetchReviewBookingDetails() async {
+    var response = await BookingsAPI().reviewDetailsApi(context);
+    if (response != null) {
+      print(response);
+    } else {
+      print('error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
         backgroundColor: Colors.white,
@@ -542,45 +565,103 @@ class _ReviewBookingScreenState extends State<ReviewBookingScreen> {
                     SizedBox(
                       height: 10,
                     ),
-                    TextFormField(
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "";
-                        } else {
-                          return null;
-                        }
-                      },
-                      keyboardType: TextInputType.text,
-                      style: TextStyle(fontSize: 14),
-                      inputFormatters: <TextInputFormatter>[
-                        // FilteringTextInputFormatter.allow(RegExp(
-                        //   "[0-9]",
-                        // )),
-                        // LengthLimitingTextInputFormatter(10),
-                      ],
+                    // TextFormField(
+                    //   validator: (value) {
+                    //     if (value!.isEmpty) {
+                    //       return "";
+                    //     } else {
+                    //       return null;
+                    //     }
+                    //   },
+                    //   keyboardType: TextInputType.text,
+                    //   style: TextStyle(fontSize: 14),
+                    //   inputFormatters: <TextInputFormatter>[
+                    //     // FilteringTextInputFormatter.allow(RegExp(
+                    //     //   "[0-9]",
+                    //     // )),
+                    //     // LengthLimitingTextInputFormatter(10),
+                    //   ],
+                    //   decoration: InputDecoration(
+                    //     hintText: 'State',
+                    //     hintStyle: TextStyle(
+                    //       fontSize: 15,
+                    //       color: Colors.grey,
+                    //     ),
+                    //     fillColor: Colors.white,
+                    //     filled: true,
+                    //     suffixIcon: Icon(Icons.keyboard_arrow_down_sharp),
+                    //     focusedBorder: OutlineInputBorder(
+                    //       borderSide: BorderSide(
+                    //         color: Colors.white,
+                    //         width:
+                    //             1.0, // Set the width of the border when focused
+                    //       ),
+                    //       borderRadius: BorderRadius.circular(
+                    //           12.0), // Set the border radius if needed
+                    //     ),
+                    //     enabledBorder: OutlineInputBorder(
+                    //       borderSide:
+                    //           BorderSide(color: Colors.white, width: 1.0),
+                    //       borderRadius: BorderRadius.circular(12),
+                    //     ),
+                    //   ),
+                    // ),
+                    DropdownButtonFormField2<String>(
+                      isExpanded: true,
                       decoration: InputDecoration(
-                        hintText: 'State',
-                        hintStyle: TextStyle(
-                          fontSize: 15,
-                          color: Colors.grey,
-                        ),
                         fillColor: Colors.white,
                         filled: true,
-                        suffixIcon: Icon(Icons.keyboard_arrow_down_sharp),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                            width:
-                                1.0, // Set the width of the border when focused
-                          ),
-                          borderRadius: BorderRadius.circular(
-                              12.0), // Set the border radius if needed
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 16),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.white, width: 1.0),
-                          borderRadius: BorderRadius.circular(12),
+                      ),
+                      hint: const Text(
+                        'State',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      items: stateItems
+                          .map((item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: Text(
+                                  item,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select state';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        //Do something when selected item is changed.
+                      },
+                      onSaved: (value) {
+                        selectedValue = value.toString();
+                      },
+                      buttonStyleData: const ButtonStyleData(
+                        padding: EdgeInsets.only(right: 8),
+                      ),
+                      iconStyleData: const IconStyleData(
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_sharp,
+                          color: Colors.black,
                         ),
+                        iconSize: 24,
+                      ),
+                      dropdownStyleData: DropdownStyleData(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      menuItemStyleData: const MenuItemStyleData(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
                       ),
                     ),
                     SizedBox(
